@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -41,7 +42,6 @@ public class AddFriend extends JDialog {
 			AbstractListModel listmodel) {
 		setTitle("Add Friend\n");
 		setBounds(350, 250, 450, 300);
-		// setDefaultCloseOperation(DISPOSE_ON_CLOSE);//只关闭当前窗口
 		contentPane = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -68,11 +68,12 @@ public class AddFriend extends JDialog {
 		scrollPane_2.setOpaque(false);
 		scrollPane_2.getViewport().setOpaque(false);
 		getContentPane().add(scrollPane_2);
-
+		
+		//双击提示加好友
 		list.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				List to = list.getSelectedValuesList();
-
+				//判断双击
 				if (e.getClickCount() == 2) {
 
 					if (to.toString().contains(name + "(我)")) {
@@ -85,6 +86,7 @@ public class AddFriend extends JDialog {
 										+ "为好友", "提示",
 								JOptionPane.YES_NO_OPTION);
 						System.out.println("addFriend:"+addFriend);
+						//确认要加好友  发送到服务器
 						if (addFriend == 0) {
 							try {
 								oos = new ObjectOutputStream(client
@@ -95,6 +97,10 @@ public class AddFriend extends JDialog {
 								bean.setType(7);//注册
 								bean.setName(name);
 								bean.setTimer(CatUtil.getTimer());
+								HashSet<String> set = new HashSet<String>();
+								// 客户昵称
+								set.addAll(to);
+								bean.setClients(set);
 								bean.setInfo("addFriend");
 								oos.writeObject(bean);
 								oos.flush();

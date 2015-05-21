@@ -166,7 +166,7 @@ public class CatServer {
 					}
 					case 5: {
 						// 创建服务器的catbean，并发送给客户端
-						System.out.println("server5");
+						//System.out.println("server5");
 						CatBean serverBean = new CatBean();
 						serverBean.setType(5);
 						serverBean.setInfo("登陆成功");
@@ -177,9 +177,9 @@ public class CatServer {
 						Properties userPro = new Properties();
 						File file = new File("Users.properties");
 						CatUtil.loadPro(userPro, file);// userPro 取得的所有用户名密码数据
-						System.out.println("snowserver~~");
-						System.out.println("snowserver:"
-								+ userPro.getProperty(bean.getName()));
+						//System.out.println("snowserver~~");
+						//System.out.println("snowserver:"
+						//		+ userPro.getProperty(bean.getName()));
 						if (userPro.containsKey(bean.getName())) {// 用户名存在
 							if (userPro.getProperty(bean.getName()).equals(
 									bean.getPassword())) {
@@ -195,7 +195,7 @@ public class CatServer {
 						// 设置返回给自己
 						set.add(bean.getName());
 						serverBean.setClients(set);
-						sendMessageToMyself(serverBean);
+						sendMessageToOne(serverBean);
 						break;
 					}
 					case 6: {// 注册事件
@@ -223,7 +223,7 @@ public class CatServer {
 						// 客户昵称
 						set.add(bean.getName());
 						serverBean.setClients(set);
-						sendMessageToMyself(serverBean);
+						sendMessageToOne(serverBean);
 						break;
 					}
 					case 7 :{
@@ -235,10 +235,12 @@ public class CatServer {
 							//TODO 判断是否在Friend列表中
 							CatBean serverBean = new CatBean();
 							serverBean.setType(7);
+							
 							serverBean.setClients(bean.getClients());
 							serverBean.setInfo(bean.getInfo());
 							serverBean.setName(bean.getName());
 							serverBean.setTimer(bean.getTimer());
+							System.out.println("将要添加 server："+bean.getClients().toString());
 							// 向选中的客户发送数据
 							sendMessage(serverBean);
 						}else if (bean.getInfo().equals("addFriendBack")) {//同意好友请求
@@ -254,6 +256,7 @@ public class CatServer {
 							serverBean.setTimer(bean.getTimer());
 							// 向选中的客户发送数据
 							sendMessage(serverBean);
+							System.out.println("添加成功 server");
 						}
 						
 						break;
@@ -302,7 +305,7 @@ public class CatServer {
 		}
 
 		// 向选中的用户发送数据
-		private void sendMessageToMyself(CatBean serverBean) {
+		private void sendMessageToOne(CatBean serverBean) {
 			// 首先取得所有的values
 			Socket c = client;
 			ObjectOutputStream oos;

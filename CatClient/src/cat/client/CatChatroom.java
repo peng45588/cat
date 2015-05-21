@@ -335,14 +335,15 @@ public class CatChatroom extends JFrame {
 				}
 			}
 		});
-
+		
+		//添加好友按钮 
 		btnAddFriend.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				AddFriend frame = new AddFriend(clientSocket, name, listmodel);
-				frame.setVisible(true);// 显示注册界面
+				frame.setVisible(true);// 显示在线用户列表
 			}
 		});
 		// 离开
@@ -722,12 +723,19 @@ public class CatChatroom extends JFrame {
 								beanBack.setName(name);
 								beanBack.setTimer(CatUtil.getTimer());
 								beanBack.setInfo("addFriendBack");
-								oos.writeObject(bean);
+								HashSet<String> set = new HashSet<String>();
+								// 客户昵称
+								set.add(bean.getName());
+								beanBack.setClients(set);
+								oos = new ObjectOutputStream(clientSocket.getOutputStream());
+								oos.writeObject(beanBack);
 								oos.flush();
+
+								System.out.println("将要添加client");
 							}
 						}else if (bean.getInfo().equals("addFriendBack")) {//收到别人同意添加好友的请求
 							//TODO 显示在右上角其为好友
-							
+							System.out.println("添加成功 client");
 						}
 						
 						break;
