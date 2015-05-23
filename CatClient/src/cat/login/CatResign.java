@@ -121,7 +121,7 @@ public class CatResign extends JFrame {
 							if (u_pwd.length() != 0) {
 
 								// 发送到服务端
-								CatLogin.client = new Socket("localhost", 8523);
+								CatLogin.client = new Socket("localhost", 8532);
 								CatLogin.oos = new ObjectOutputStream(client
 										.getOutputStream());
 

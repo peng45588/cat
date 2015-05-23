@@ -431,8 +431,7 @@ public class CatChatroom extends JFrame {
 					final CatBean bean = (CatBean) ois.readObject();
 					switch (bean.getType()) {
 					case 0: {
-						// 更新列表,
-						// TODO　及好友列表
+						// 更新在线名单列表,无需打印出来
 						onlines.clear();
 						HashSet<String> clients = bean.getClients();
 						Iterator<String> it = clients.iterator();
@@ -446,7 +445,43 @@ public class CatChatroom extends JFrame {
 						}
 
 						listmodel = new UUListModel(onlines);
+						break;
+					}
+					case 100: {//接收在线好友信息
+						myFriend.clear();
+						HashSet<String> clients = bean.getClients();
+						Iterator<String> it = clients.iterator();
+						while (it.hasNext()) {
+							String ele = it.next();
+							if (name.equals(ele)) {
+								myFriend.add(ele + "(我)");
+							} else {
+								myFriend.add(ele);
+							}
+						}
 
+						friendListModel = new UUListModel(myFriend);
+						list.setModel(friendListModel);
+						aau2.play();
+						textArea.append(bean.getInfo() + "\r\n");
+						textArea.selectAll();
+						break;
+					}
+					case 101: {//接收好友上线信息
+						myFriend.clear();
+						HashSet<String> clients = bean.getClients();
+						Iterator<String> it = clients.iterator();
+						while (it.hasNext()) {
+							String ele = it.next();
+							if (name.equals(ele)) {
+								myFriend.add(ele + "(我)");
+							} else {
+								myFriend.add(ele);
+							}
+						}
+
+						friendListModel = new UUListModel(myFriend);
+						list.setModel(friendListModel);
 						aau2.play();
 						textArea.append(bean.getInfo() + "\r\n");
 						textArea.selectAll();
@@ -457,14 +492,19 @@ public class CatChatroom extends JFrame {
 						return;
 					}
 					case 1: {// 聊天
-
-						String info = bean.getTimer() + "  " + bean.getName()
+						String info;
+						if (name.equals(bean.getName())) {
+							info = "他不是你的好友 ";
+						}else{
+							info = bean.getTimer() + "  " + bean.getName()
 								+ " 对 " + bean.getClients() + "说:\r\n";
-						if (info.contains(name)) {
-							info = info.replace(name, "我");
+							if (info.contains(name)) {
+								info = info.replace(name, "我");
+							}
+							info += bean.getInfo();
 						}
 						aau.play();
-						textArea.append(info + bean.getInfo() + "\r\n");
+						textArea.append(info + "\r\n");
 						textArea.selectAll();
 						break;
 					}

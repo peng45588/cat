@@ -66,12 +66,19 @@ public class CatServer {
 						serverBean.setType(0);
 						serverBean.setInfo(bean.getTimer() + "  "
 								+ bean.getName() + "上线了");
-						// 通知所有客户有人上线
+						// 通知所有客户更新上线列表
 						HashSet<String> set = new HashSet<String>();
 						// 客户昵称
 						set.addAll(onlines.keySet());
 						serverBean.setClients(set);
 						sendAll(serverBean);
+						
+						//发给好友与自己 上线信息，端口为100
+						serverBean.setType(100);
+						HashSet<String> set100 = getFriendSet(bean,set);
+						set100.add(bean.getName());
+						serverBean.setClients(set100);
+						sendMessage(serverBean);
 						break;
 					}
 					case -1: { // 下线
@@ -104,12 +111,16 @@ public class CatServer {
 						return;
 					}
 					case 1: { // 聊天
-
-						// 创建服务器的catbean，并发送给客户端
+						//获取该用户好友列表,判断是否为好友，若不是则发回
+						HashSet<String> set = getFriendSet(bean,bean.getClients());
 						CatBean serverBean = new CatBean();
-
+						if (set.isEmpty()) {
+							set.add(bean.getName());
+						}
+						serverBean.setClients(set);
+						////////////////////
+						
 						serverBean.setType(1);
-						serverBean.setClients(bean.getClients());
 						serverBean.setInfo(bean.getInfo());
 						serverBean.setName(bean.getName());
 						serverBean.setTimer(bean.getTimer());
@@ -232,11 +243,20 @@ public class CatServer {
 						File file = new File("Friend.properties");
 						CatUtil.loadPro(friendPro, file);// friendPro 取得的所有用户名密码数据
 						if (bean.getInfo().equals("addFriend")) {//发起好友请求
-							//TODO 判断是否在Friend列表中
+							//判断是否为好友，若不是则将名字加到ret中
+							HashSet<String> ret = new HashSet<String>();
+							Iterator<String> it = bean.getClients().iterator();
+							while (it.hasNext()) {
+								String name = it.next();
+								if (!friendPro.toString().contains("friend"+bean.getName()+"="+name)) {
+									ret.add(name);
+								}
+							}
+							
 							CatBean serverBean = new CatBean();
 							serverBean.setType(7);
 							
-							serverBean.setClients(bean.getClients());
+							serverBean.setClients(ret);
 							serverBean.setInfo(bean.getInfo());
 							serverBean.setName(bean.getName());
 							serverBean.setTimer(bean.getTimer());
@@ -245,9 +265,38 @@ public class CatServer {
 							sendMessage(serverBean);
 						}else if (bean.getInfo().equals("addFriendBack")) {//同意好友请求
 							//TODO 加入Friend列表中
+							int i = 1;
+							while (true) {
+								if (friendPro.toString().contains(i+"friend"+bean.getName())) {
+									i++;
+								}else {
+									break;
+								}
+							}
+							System.out.println(friendPro+":sssiiii:"+i+"friend"+bean.getName());
+							Iterator<String> it = bean.getClients().iterator();
+							while (it.hasNext()) {
+								setPassword(friendPro, file, i+"friend"+bean.getName(),
+										it.next());
+								i++;
+							}
+							it = bean.getClients().iterator();
+							while (it.hasNext()) {
+								String name = it.next();
+								i = 1;
+								while (true) {
+									if (friendPro.toString().contains(i+"friend"+name)) {
+										i++;
+										System.out.println("sss:"+name);
+									}else {
+										break;
+									}
+								}
+								setPassword(friendPro, file, i+"friend"+name,
+										bean.getName());
+							}
 							
-							setFriend(friendPro, file, bean.getName(),
-									bean.getClients().toString());
+							//TODO bean.getClients()只能为一个   待改
 							CatBean serverBean = new CatBean();
 							serverBean.setType(7);
 							serverBean.setClients(bean.getClients());
@@ -275,6 +324,34 @@ public class CatServer {
 			} finally {
 				close();
 			}
+		}
+
+		private HashSet<String> getFriendSet(CatBean bean,HashSet<String> clients) {
+			// TODO Auto-generated method stub
+			Properties userPro = new Properties();
+			File file = new File("Friend.properties");
+			CatUtil.loadPro(userPro, file);// userPro 取得的所有用户名密码数据
+			
+			int i = 1;
+			HashSet<String> set = new HashSet<String>();
+			if (clients==null) {
+				return new HashSet<String>();
+			}
+			Object [] arr = clients.toArray();
+			while(true){
+				if (userPro.containsKey(i+"friend"+bean.getName())) {// 用户名存在
+					for (int j = 0; j < arr.length; j++) {
+						if (userPro.get(i+"friend"+bean.getName()).toString().equals(arr[j].toString())) {
+							set.add(userPro.get(i+"friend"+bean.getName()).toString());
+							break;
+						}
+					}
+					i++;
+				} else {
+					break;
+				}
+			}
+			return set;
 		}
 
 		// 向选中的用户发送数据
