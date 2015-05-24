@@ -128,6 +128,17 @@ public class CatServer {
 						sendMessage(serverBean);
 						break;
 					}
+					case 110:{
+						CatBean serverBean = new CatBean();
+
+						serverBean.setType(110);
+						serverBean.setClients(bean.getClients()); // 文件来源
+						serverBean.setName(bean.getName());// 接收的客户名称
+						serverBean.setTimer(bean.getTimer());
+						sendMessage(serverBean);
+
+						break;
+					}
 					case 2: { // 请求接受文件
 						// 创建服务器的catbean，并发送给客户端
 						CatBean serverBean = new CatBean();

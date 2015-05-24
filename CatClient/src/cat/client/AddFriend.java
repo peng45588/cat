@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -18,12 +19,15 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
 
 import cat.function.CatBean;
 import cat.util.CatUtil;
@@ -34,14 +38,17 @@ public class AddFriend extends JDialog {
 	private static AbstractListModel listmodel;
 	private static Vector onlines;
 	private static JList list;
-
+	private JTextField textField;
 	public static ObjectInputStream ois;
 	public static ObjectOutputStream oos;
 
 	public AddFriend(final Socket client, final String name,
-			AbstractListModel listmodel) {
+			final AbstractListModel listmodel) {
 		setTitle("Add Friend\n");
 		setBounds(350, 250, 450, 300);
+		textField = new JTextField(10);
+		textField.setBounds(220,10,200,20);
+		getContentPane().add(textField);
 		contentPane = new JPanel() {
 			private static final long serialVersionUID = 1L;
 
@@ -59,8 +66,8 @@ public class AddFriend extends JDialog {
 		list.setModel(listmodel);
 		list.setOpaque(false);
 		Border etch = BorderFactory.createEtchedBorder();
-		list.setBorder(BorderFactory.createTitledBorder(etch, "<" + name + ">"
-				+ "在线用户<双击添加>:", TitledBorder.LEADING, TitledBorder.TOP,
+		list.setBorder(BorderFactory.createTitledBorder(etch, "在线用户<双击添加>:", 
+				TitledBorder.LEADING, TitledBorder.TOP,
 				new Font("sdf", Font.BOLD, 20), Color.green));
 
 		JScrollPane scrollPane_2 = new JScrollPane(list);
@@ -69,6 +76,43 @@ public class AddFriend extends JDialog {
 		scrollPane_2.getViewport().setOpaque(false);
 		getContentPane().add(scrollPane_2);
 		
+		
+		//JTextField 监听
+		textField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				String s = textField.getText().trim();
+				setList(s);
+			}
+			private void setList(String s) {
+				// TODO Auto-generated method stub
+				// 在线客户列表
+				Vector myFriend = new Vector();
+				AbstractListModel friendListModel;
+				for (int i = 0; i < listmodel.getSize(); i++) {
+					if (listmodel.getElementAt(i).toString().contains(s)) {
+						myFriend.add(listmodel.getElementAt(i));
+						
+					}
+				}
+				friendListModel = new UUListModel(myFriend);
+				list.setModel(friendListModel);
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				String s = textField.getText().trim();
+				setList(s);
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				String s = textField.getText().trim();//trim()方法用于去掉你可能误输入的空格号
+				setList(s);
+			}
+		}
+		 );
 		//双击提示加好友
 		list.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {

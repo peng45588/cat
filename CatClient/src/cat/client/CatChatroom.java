@@ -282,36 +282,38 @@ public class CatChatroom extends JFrame {
 		// 发送按钮
 		btnSendMsg.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String info = textArea_1.getText();
+				String infotext = textArea_1.getText();
 				List to = list.getSelectedValuesList();
 
-				if (to.size() < 1) {
-					JOptionPane.showMessageDialog(getContentPane(), "请选择聊天对象");
+				if (to.size() != 1) {
+					JOptionPane.showMessageDialog(getContentPane(), "请选择聊天对象,聊天对象只能为一个");
 					return;
 				}
 				if (to.toString().contains(name + "(我)")) {
-					JOptionPane
-							.showMessageDialog(getContentPane(), "不能向自己发送信息");
+					JOptionPane.showMessageDialog(getContentPane(), "不能向自己发送信息");
 					return;
 				}
-				if (info.equals("")) {
+				if (infotext.equals("")) {
 					JOptionPane.showMessageDialog(getContentPane(), "不能发送空信息");
 					return;
 				}
-
+				if (info!=null) {//若上一条没发送成功，则不发送过去：//TODO 改成可以丢弃 或者重新发送
+					JOptionPane.showMessageDialog(getContentPane(), "上一条信息未发送成功");
+					return;
+				}
 				CatBean clientBean = new CatBean();
 				clientBean.setType(1);
 				clientBean.setName(name);
 				String time = CatUtil.getTimer();
 				clientBean.setTimer(time);
-				String encrypt = AES.encrypt(info, AES.password+name);//加密   密钥为设定密钥+发起聊天方用户名
+				String encrypt = AES.encrypt(infotext, AES.password+name+to.iterator().next());//加密   密钥为设定密钥+发起聊天方用户名
 				clientBean.setInfo(encrypt);
 				HashSet set = new HashSet();
 				set.addAll(to);
 				clientBean.setClients(set);
 
 				// 自己发的内容也要现实在自己的屏幕上面
-				textArea.append(time + " 我对" + to + "说:\r\n" + info + "\r\n");
+				textArea.append(time + " 我对" + to + "说:\r\n" + infotext + "\r\n");
 
 				sendMessage(clientBean);
 				textArea_1.setText(null);
@@ -421,6 +423,7 @@ public class CatChatroom extends JFrame {
 
 	}
 
+	String info = null;//判断是否发送成功
 	class ClientInputThread extends Thread {
 
 		@Override
@@ -493,7 +496,6 @@ public class CatChatroom extends JFrame {
 						return;
 					}
 					case 1: {// 聊天
-						String info;
 						if (name.equals(bean.getName())) {
 							JOptionPane.showConfirmDialog(getContentPane(), "他还不是你的好友！不能发起聊天");
 						}else{
@@ -504,12 +506,32 @@ public class CatChatroom extends JFrame {
 								info = bean.getTimer() + "  " + bean.getName()
 										+ " 对  我" + "说:\r\n";
 							}
-							String decrypt = AES.decrypt(bean.getInfo(), AES.password+bean.getName());//解密，密钥为初始密钥+发起方用户名
+							String decrypt = AES.decrypt(bean.getInfo(), AES.password+bean.getName()+name);//解密，密钥为初始密钥+发起方用户名
 							info += decrypt;
-						aau.play();
-						textArea.append(info + "\r\n");
-						textArea.selectAll();
+							aau.play();
+							textArea.append(info + "\r\n");
+							textArea.selectAll();
+							info = null;
+							//返回给源用户 聊天接收成功
+							CatBean beanBack = new CatBean();
+							beanBack.setType(110);
+							beanBack.setName(name);
+							beanBack.setTimer(CatUtil.getTimer());//接收成功时的时间
+							HashSet<String> set = new HashSet<String>();
+							// 客户的昵称
+							set.add(bean.getName());
+							beanBack.setClients(set);
+							oos = new ObjectOutputStream(clientSocket.getOutputStream());
+							oos.writeObject(beanBack);
+							oos.flush();
 						}
+						break;
+					}
+					case 110:{//聊天内容发送成功的回执
+						aau.play();
+						textArea.append(bean.getTimer()+",对方已收到" + "\r\n\r\n");
+						textArea.selectAll();
+						info=null;
 						break;
 					}
 					case 2: {
@@ -780,7 +802,6 @@ public class CatChatroom extends JFrame {
 								oos.writeObject(beanBack);
 								oos.flush();
 
-								System.out.println("将要添加client");
 							}
 						}else if (bean.getInfo().equals("addFriendBack")) {//收到别人同意添加好友的请求
 							//TODO 显示在右上角其为好友
