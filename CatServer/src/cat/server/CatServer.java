@@ -161,7 +161,7 @@ public class CatServer {
 						sendMessage(serverBean);
 						break;
 					}
-					case 4: {
+					case 4: {//中途取消接收文件
 						CatBean serverBean = new CatBean();
 
 						serverBean.setType(4);
@@ -175,7 +175,7 @@ public class CatServer {
 
 						break;
 					}
-					case 5: {
+					case 5: {//登陆
 						// 创建服务器的catbean，并发送给客户端
 						//System.out.println("server5");
 						CatBean serverBean = new CatBean();

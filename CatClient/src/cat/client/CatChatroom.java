@@ -68,7 +68,6 @@ class CellRenderer extends JLabel implements ListCellRenderer {
 			int index, boolean isSelected, boolean cellHasFocus) {
 
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));// 加入宽度为5的空白边框
-
 		if (value != null) {
 			setText(value.toString());
 			setIcon(new ImageIcon("images//1.jpg"));
@@ -496,7 +495,7 @@ public class CatChatroom extends JFrame {
 					case 1: {// 聊天
 						String info;
 						if (name.equals(bean.getName())) {
-							info = "他不是你的好友 ";
+							JOptionPane.showConfirmDialog(getContentPane(), "他还不是你的好友！不能发起聊天");
 						}else{
 							if (bean.getName().equals(name)) {
 								info = bean.getTimer() + "  我"
@@ -507,14 +506,17 @@ public class CatChatroom extends JFrame {
 							}
 							String decrypt = AES.decrypt(bean.getInfo(), AES.password+bean.getName());//解密，密钥为初始密钥+发起方用户名
 							info += decrypt;
-						}
 						aau.play();
 						textArea.append(info + "\r\n");
 						textArea.selectAll();
+						}
 						break;
 					}
 					case 2: {
 						// 由于等待目标客户确认是否接收文件是个阻塞状态，所以这里用线程处理
+						if (name.equals(bean.getName())) {
+							JOptionPane.showConfirmDialog(getContentPane(), "他还不是你的好友！不能发送文件");
+						}else{
 						new Thread() {
 							public void run() {
 								// 显示是否接收文件对话框
@@ -663,6 +665,7 @@ public class CatChatroom extends JFrame {
 								}
 							};
 						}.start();
+						}
 						break;
 					}
 					case 3: { // 目标客户愿意接收文件，源客户开始读取本地文件并发送到网络上
@@ -741,7 +744,7 @@ public class CatChatroom extends JFrame {
 						}.start();
 						break;
 					}
-					case 4: {
+					case 4: {//中途取消接收文件
 						textArea.append(bean.getInfo() + "\r\n");
 						break;
 					}
