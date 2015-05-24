@@ -781,7 +781,6 @@ public class CatChatroom extends JFrame {
 							int addFriend = JOptionPane.showConfirmDialog(
 									getContentPane(),"用户<"+bean.getName()+">想要加您为好友，是否接受？", "提示",
 									JOptionPane.YES_NO_OPTION);
-							System.out.println("addFriend:"+addFriend);
 							if (addFriend==0) {//点击了是,添加好友并告知服务器
 								//TODO 显示在右上角其为好友
 								

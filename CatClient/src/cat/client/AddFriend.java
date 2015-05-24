@@ -129,7 +129,6 @@ public class AddFriend extends JDialog {
 								getContentPane(), "是否添加" + to.toString()
 										+ "为好友", "提示",
 								JOptionPane.YES_NO_OPTION);
-						System.out.println("addFriend:"+addFriend);
 						//确认要加好友  发送到服务器
 						if (addFriend == 0) {
 							try {

@@ -134,7 +134,6 @@ public class CatResign extends JFrame {
 								bean.setClients(set);
 								bean.setTimer(CatUtil.getTimer());
 								CatLogin.oos.writeObject(bean);
-								System.out.println("client");
 								CatLogin.oos.flush();
 								// 启动客户接收线程
 								new ClientLoginThread().start();
@@ -183,7 +182,6 @@ public class CatResign extends JFrame {
 					switch (bean.getType()) {
 					case 6: {
 						// TODO 判断是否注册成功
-						System.out.println("snow::" + bean.getInfo());
 						if (bean.getInfo().equals("用户名已存在")) {
 							lblNewLabel.setText("用户名已存在!");
 						} else if (bean.getInfo().equals("注册成功")) {
@@ -192,7 +190,6 @@ public class CatResign extends JFrame {
 							CatLogin frame = new CatLogin();
 							frame.setVisible(true);
 							setVisible(false);
-							System.out.println("get6Register");
 						}
 						break;
 					}

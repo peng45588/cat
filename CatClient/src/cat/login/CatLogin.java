@@ -138,7 +138,6 @@ public class CatLogin extends JFrame {
 					bean.setClients(set);
 					bean.setTimer(CatUtil.getTimer());
 					oos.writeObject(bean);
-System.out.println("client");
 					oos.flush();
 					// 启动客户接收线程
 					new ClientLoginThread().start();
@@ -183,7 +182,6 @@ System.out.println("client");
 					final CatBean  bean = (CatBean) ois.readObject();
 					switch (bean.getType()) {
 					case 5:{
-						System.out.println("get5:"+bean.getInfo());
 						if (bean.getInfo().equals("登陆成功")) {
 							String u_name = textField.getText();
 							btnLogin.setEnabled(false);

@@ -188,7 +188,6 @@ public class CatServer {
 					}
 					case 5: {//登陆
 						// 创建服务器的catbean，并发送给客户端
-						//System.out.println("server5");
 						CatBean serverBean = new CatBean();
 						serverBean.setType(5);
 						serverBean.setInfo("登陆成功");
@@ -199,9 +198,6 @@ public class CatServer {
 						Properties userPro = new Properties();
 						File file = new File("Users.properties");
 						CatUtil.loadPro(userPro, file);// userPro 取得的所有用户名密码数据
-						//System.out.println("snowserver~~");
-						//System.out.println("snowserver:"
-						//		+ userPro.getProperty(bean.getName()));
 						if (userPro.containsKey(bean.getName())) {// 用户名存在
 							if (userPro.getProperty(bean.getName()).equals(
 									bean.getPassword())) {
@@ -213,7 +209,6 @@ public class CatServer {
 							serverBean.setInfo("该用户不存在");
 						}
 						HashSet<String> set = new HashSet<String>();
-						System.out.println("send5");
 						// 设置返回给自己
 						set.add(bean.getName());
 						serverBean.setClients(set);
@@ -238,10 +233,8 @@ public class CatServer {
 									bean.getPassword());
 							serverBean.setInfo("注册成功");
 						}
-						System.out.println("server6");
 
 						HashSet<String> set = new HashSet<String>();
-						System.out.println("send6");
 						// 客户昵称
 						set.add(bean.getName());
 						serverBean.setClients(set);
@@ -271,7 +264,6 @@ public class CatServer {
 							serverBean.setInfo(bean.getInfo());
 							serverBean.setName(bean.getName());
 							serverBean.setTimer(bean.getTimer());
-							System.out.println("将要添加 server："+bean.getClients().toString());
 							// 向选中的客户发送数据
 							sendMessage(serverBean);
 						}else if (bean.getInfo().equals("addFriendBack")) {//同意好友请求
@@ -284,7 +276,6 @@ public class CatServer {
 									break;
 								}
 							}
-							System.out.println(friendPro+":sssiiii:"+i+"friend"+bean.getName());
 							Iterator<String> it = bean.getClients().iterator();
 							while (it.hasNext()) {
 								setPassword(friendPro, file, i+"friend"+bean.getName(),
@@ -298,8 +289,7 @@ public class CatServer {
 								while (true) {
 									if (friendPro.toString().contains(i+"friend"+name)) {
 										i++;
-										System.out.println("sss:"+name);
-									}else {
+										}else {
 										break;
 									}
 								}
@@ -316,7 +306,6 @@ public class CatServer {
 							serverBean.setTimer(bean.getTimer());
 							// 向选中的客户发送数据
 							sendMessage(serverBean);
-							System.out.println("添加成功 server");
 						}
 						
 						break;
