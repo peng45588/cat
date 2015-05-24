@@ -56,6 +56,7 @@ import javax.swing.border.TitledBorder;
 
 import cat.function.CatBean;
 import cat.login.CatResign;
+import cat.util.AES;
 import cat.util.CatUtil;
 
 class CellRenderer extends JLabel implements ListCellRenderer {
@@ -304,7 +305,8 @@ public class CatChatroom extends JFrame {
 				clientBean.setName(name);
 				String time = CatUtil.getTimer();
 				clientBean.setTimer(time);
-				clientBean.setInfo(info);
+				String encrypt = AES.encrypt(info, AES.password+name);//加密   密钥为设定密钥+发起聊天方用户名
+				clientBean.setInfo(encrypt);
 				HashSet set = new HashSet();
 				set.addAll(to);
 				clientBean.setClients(set);
@@ -496,12 +498,15 @@ public class CatChatroom extends JFrame {
 						if (name.equals(bean.getName())) {
 							info = "他不是你的好友 ";
 						}else{
-							info = bean.getTimer() + "  " + bean.getName()
-								+ " 对 " + bean.getClients() + "说:\r\n";
-							if (info.contains(name)) {
-								info = info.replace(name, "我");
+							if (bean.getName().equals(name)) {
+								info = bean.getTimer() + "  我"
+										+ " 对 " + bean.getClients() + "说:\r\n";
+							}else {
+								info = bean.getTimer() + "  " + bean.getName()
+										+ " 对  我" + "说:\r\n";
 							}
-							info += bean.getInfo();
+							String decrypt = AES.decrypt(bean.getInfo(), AES.password+bean.getName());//解密，密钥为初始密钥+发起方用户名
+							info += decrypt;
 						}
 						aau.play();
 						textArea.append(info + "\r\n");
@@ -754,6 +759,7 @@ public class CatChatroom extends JFrame {
 							System.out.println("addFriend:"+addFriend);
 							if (addFriend==0) {//点击了是,添加好友并告知服务器
 								//TODO 显示在右上角其为好友
+								
 								myFriend.add(bean.getName());
 								friendListModel = new UUListModel(myFriend);
 								list.setModel(friendListModel);
@@ -775,7 +781,9 @@ public class CatChatroom extends JFrame {
 							}
 						}else if (bean.getInfo().equals("addFriendBack")) {//收到别人同意添加好友的请求
 							//TODO 显示在右上角其为好友
-							System.out.println("添加成功 client");
+							myFriend.add(bean.getName());
+							friendListModel = new UUListModel(myFriend);
+							list.setModel(friendListModel);
 						}
 						
 						break;

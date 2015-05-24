@@ -31,7 +31,6 @@ public class CatUtil {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	public static String getTimer() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return sdf.format(new Date());
