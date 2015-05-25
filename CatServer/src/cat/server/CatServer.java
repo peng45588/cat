@@ -135,6 +135,7 @@ public class CatServer {
 						serverBean.setClients(bean.getClients()); // 文件来源
 						serverBean.setName(bean.getName());// 接收的客户名称
 						serverBean.setTimer(bean.getTimer());
+						serverBean.setInfo(bean.getInfo());
 						sendMessage(serverBean);
 
 						break;

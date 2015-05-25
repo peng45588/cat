@@ -507,16 +507,23 @@ public class CatChatroom extends JFrame {
 										+ " 对  我" + "说:\r\n";
 							}
 							String decrypt = AES.decrypt(bean.getInfo(), AES.password+bean.getName()+name);//解密，密钥为初始密钥+发起方用户名
+
+							//返回给源用户 聊天接收成功
+							CatBean beanBack = new CatBean();
+							beanBack.setType(110);
+							beanBack.setName(name);
+							beanBack.setTimer(CatUtil.getTimer());//返回的时间
+
+							System.out.println("decrypt:"+decrypt+";;;");
+							if (decrypt==null) {//检验和不正确，告知客户端发送失败
+								beanBack.setInfo("error");
+							}else{
 							info += decrypt;
 							aau.play();
 							textArea.append(info + "\r\n");
 							textArea.selectAll();
 							info = null;
-							//返回给源用户 聊天接收成功
-							CatBean beanBack = new CatBean();
-							beanBack.setType(110);
-							beanBack.setName(name);
-							beanBack.setTimer(CatUtil.getTimer());//接收成功时的时间
+							}
 							HashSet<String> set = new HashSet<String>();
 							// 客户的昵称
 							set.add(bean.getName());
@@ -527,9 +534,15 @@ public class CatChatroom extends JFrame {
 						}
 						break;
 					}
-					case 110:{//聊天内容发送成功的回执
+					case 110:{//聊天内容收到的回执
 						aau.play();
-						textArea.append(bean.getTimer()+",对方已收到" + "\r\n\r\n");
+						String infoString = "";
+						if (bean.getInfo()==null) {
+							infoString = ",对方已收到";
+						}else if (bean.getInfo().equals("error")){
+							infoString = ",网络传输错误";
+							}
+						textArea.append(bean.getTimer()+ infoString + "\r\n\r\n");
 						textArea.selectAll();
 						info=null;
 						break;
